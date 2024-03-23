@@ -22,15 +22,12 @@ ocm_api_key = os.getenv("ocm_api_key")
 api_key =  os.getenv("googleMaps_api_key")
 X_RapidAPI_Key = os.getenv("X-RapidAPI-Key")
 
-
-
-
 from geopy.geocoders import Nominatim
 
 #to clean up wikipedia info
 from bs4 import BeautifulSoup
 
-
+POI_df = pd.DataFrame()
 
 def get_lat_long_from_address(address):
    locator = Nominatim(user_agent='thomasTest')
@@ -39,7 +36,7 @@ def get_lat_long_from_address(address):
    return str(location.latitude) +"," + str(location.longitude)
 
 
-def get_nearby_restaurants(latitude, longitude):
+def get_nearby_restaurants(latitude, longitude): #by yelp
 
    yelp_api_url = 'https://api.yelp.com/v3/businesses/search'
 
@@ -56,7 +53,6 @@ def get_nearby_restaurants(latitude, longitude):
 def get_nearby_charging_stations(latitude, longitude):
    # Use Open Charge Map API to get nearby EV charging stations
 
-
    ocm_api_url = 'https://api.openchargemap.io/v3/poi/'
 
    params = {
@@ -65,7 +61,7 @@ def get_nearby_charging_stations(latitude, longitude):
       'longitude': last_lon,
       'distance': 30,  # Search radius in kilometers
       'distanceunit': 'KM',
-      'countrycode': 'CH',  # Replace with the appropriate country code
+      #'countrycode': 'CH',  # Replace with the appropriate country code
       'maxresults': 10  # Maximum number of results
    }
 
@@ -101,7 +97,7 @@ def get_location_info(latitude, longitude):
       # You can use the title or pageid to fetch more information if needed
       #st.write(f' {title}')
       #st.write(f'Page ID: {pageid}')
-      st.markdown(detailed_info)
+      st.write(detailed_info)
 
    else:
       st.warning('Location information not found on Wikipedia.')
@@ -128,7 +124,7 @@ def get_detailed_info(title):
       # Clean up HTML tags using BeautifulSoup
       soup = BeautifulSoup(detailed_info, 'html.parser')
       cleaned_text = soup.get_text(separator='\n\n')  # Separate paragraphs with two newlines
-
+      #st.write(cleaned_text)
       return cleaned_text
    else:
       return 'Detailed information not found.'
@@ -234,7 +230,7 @@ if address:
 
 
    import folium
-   def create_map(response):
+   def create_map(response): #routingmap
       # use the response
       mls = response.json()['features'][0]['geometry']['coordinates']
       #st.write(mls)
@@ -257,7 +253,9 @@ if address:
 
    st.divider()
 
-   st.info("Information about the Destination")
+   st.info("Show Information about the Destination")
+
+
    togglecol1, togglecol2, togglecol3 = st.columns(3)
    visaWiki = togglecol1.toggle("Show Wikipedia Information", value=False, key="hej wiki")
    visaRestaurants = togglecol2.toggle("Show restaurants by Yelp")
@@ -324,9 +322,17 @@ if address:
    st.info(drivingInstructionAsText)
 
 
+   # Prepare a map centered around the destination
+   destinationMap = folium.Map(location=[last_lat, last_lon], zoom_start=13)
+   folium.Marker(
+      [last_lat, last_lon], popup="Destination", tooltip="Destination"
+   ).add_to(destinationMap)
 
 
-   if visaRestaurants:
+
+
+
+   if visaRestaurants: #by yelp
       # Display nearby restaurants
       restaurants = get_nearby_restaurants(last_lat, last_lon)
 
@@ -363,7 +369,7 @@ if address:
             popup=f"{row['Name']} - Rating: {row['Rating']}",
             icon=folium.Icon(color='red'),
             tooltip=f"{row['Name']} - {row['Category']} - Rating: {row['Rating']}",
-         ).add_to(m)
+         ).add_to(destinationMap)
 
 
 
@@ -401,7 +407,7 @@ if address:
             popup=f"{row['Name']}\n{row['Location']}\n - KW: {row['KW']}",
             tooltip=f"{row['Name']}\n{row['Location']}\n  - KW:  {row['KW']}",
             icon=folium.Icon(color='green', icon='plug')  # Green marker for charging stations
-         ).add_to(m)
+         ).add_to(destinationMap)
 
 
 
@@ -409,15 +415,7 @@ if address:
 
 
 
-   if visaRestaurants:
-      st.subheader("")
-      st.subheader("Restaurants at Destination - from Yelp")
-      st.write(restaurant_df)
 
-   if visaChargingStations:
-      st.subheader("")
-      st.subheader("Chargers at Destination")
-      st.write(charging_station_df)
 
    if visaWiki:
       get_location_info(last_lat, last_lon)
@@ -474,7 +472,7 @@ if address:
                popup=selected_type,
                tooltip=f"{idx}. {selected_type} - {name}",
                icon=folium.Icon(color='orange')
-            ).add_to(m)
+            ).add_to(destinationMap)
 
             # Extracting opening hours
             opening_hours = POI.get('opening_hours', {}).get('weekday_text', 'N/A')
@@ -500,22 +498,36 @@ if address:
          # Concatenate the list of DataFrames into a single DataFrame
          POI_df = pd.concat(POI_dfs, ignore_index=True)
 
-         # Display DataFrame
-         #st.write("\n**Information DataFrame:**")
-         if len(POI_df)>1:
-             st.subheader(f"{selected_type}" + "s" + " at Destination - by Google Maps Api")
-             st.dataframe(POI_df)
-         if len(POI_df)==1:
-             st.subheader(f"{selected_type}" + " at Destination - by Google Maps Api")
-             st.dataframe(POI_df)
-
       else:
          st.warning("No Google Maps Api locations found nearby.")
 
-   # Display the map ######################
-   st_data = st_folium(m, width=800)
+   # Display the routing map ######################
+   st.info("Route")
+   st_routingMap = st_folium(m, width=800)
 
+   st.info("Destination")
 
+   #Display the destination map
+   st_destinationMap = st_folium(destinationMap, width=800)
+
+   # Display DataFrame
+   # st.write("\n**Information DataFrame:**")
+   if len(POI_df) > 1:
+      st.subheader(f"{selected_type}" + "s" + " at Destination - by Google Maps Api")
+      st.dataframe(POI_df)
+   if len(POI_df) == 1:
+      st.subheader(f"{selected_type}" + " at Destination - by Google Maps Api")
+      st.dataframe(POI_df)
+
+   if visaRestaurants:
+      st.subheader("")
+      st.subheader("Restaurants at Destination - from Yelp")
+      st.write(restaurant_df)
+
+   if visaChargingStations:
+      st.subheader("")
+      st.subheader("Chargers at Destination")
+      st.write(charging_station_df)
 
 
 
