@@ -1,3 +1,5 @@
+#2024.05.07 update wikipedia scrape
+
 import streamlit as st
 import requests
 import pandas as pd
@@ -22,12 +24,32 @@ ocm_api_key = os.getenv("ocm_api_key")
 api_key =  os.getenv("googleMaps_api_key")
 X_RapidAPI_Key = os.getenv("X-RapidAPI-Key")
 
+
 from geopy.geocoders import Nominatim
 
-#to clean up wikipedia info
+#wikipedia info
+import requests
 from bs4 import BeautifulSoup
 
 POI_df = pd.DataFrame()
+
+
+# Function to scrape Wikipedia information for a given location name
+def scrape_wikipedia(location_name):
+    wikipedia_url = f"https://en.wikipedia.org/wiki/{location_name.replace(' ', '_')}"
+    response = requests.get(wikipedia_url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "html.parser")
+        content = soup.find("div", {"id": "mw-content-text"})
+        paragraphs = content.find_all("p")
+        wiki_info = "\n".join([p.get_text() for p in paragraphs if p.get_text()])
+        return wiki_info
+    else:
+        return None
+
+
+
 
 def get_lat_long_from_address(address):
    locator = Nominatim(user_agent='thomasTest')
@@ -418,7 +440,46 @@ if address:
 
 
    if visaWiki:
-      get_location_info(last_lat, last_lon)
+      #get_location_info(last_lat, last_lon)
+      from geopy.geocoders import Nominatim
+
+      geolocator = Nominatim(user_agent="thomastestarLatLongTillOrt")
+      location = geolocator.reverse([last_lat, last_lon])
+      #Extract town or village if available
+      address_components = location.raw.get('address', {})
+      if 1 ==1:
+       town = address_components.get('town')
+       village = address_components.get('village')
+       county = address_components.get('county')
+       state = address_components.get('state')
+
+       if town:
+           st.write("Town:", town)
+           wiki_info = scrape_wikipedia(town)
+           st.write(wiki_info)
+
+       elif village:
+           st.write("Village:", village)
+           wiki_info = scrape_wikipedia(village)
+           st.write(wiki_info)
+
+           if wiki_info == None:
+               st.write("county:", county)
+               wiki_info_county = scrape_wikipedia(county)
+               st.write(wiki_info_county)
+
+               if wiki_info_county == None:
+                   st.write("state:", state)
+                   wiki_info_state = scrape_wikipedia(state)
+                   st.write(wiki_info_state)
+
+       else:
+           st.write("No town or village found on Wikipedia.")
+
+
+
+
+
 
 
 
