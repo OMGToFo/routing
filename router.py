@@ -220,9 +220,10 @@ if loc:
 
    StartAddress = st.text_input("Start",value=Actualaddress)
    if StartAddress != Actualaddress:
-       #st.write("Startadresse changed")
+       st.write("Startadresse changed")
        try:
           actualLocation = get_lat_long_from_address(StartAddress)
+          st.write("actualLocation: ",actualLocation)
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
