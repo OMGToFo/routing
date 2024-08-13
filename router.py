@@ -205,8 +205,21 @@ if loc:
    long_actual = loc['coords']['longitude']
 
    actualLocation = (lat_actual, long_actual)
+   # Initialize Nominatim API
+   geolocator = Nominatim(user_agent="actualLocationAdress")
+
+   # Get the location (address)
+   ActuallocationAdress = geolocator.reverse(actualLocation, exactly_one=True)
+    
+   # Extract the address
+   address = ActuallocationAdress.address
+   # Output the address
+   st.write(f"The address for the coordinates {actualLocation} is: {address}")
 
    #st.write("actualLocation:", actualLocation)
+
+
+
 
 
 
