@@ -228,8 +228,8 @@ if loc:
            locator = Nominatim(user_agent='thomasActualAdress')
            Actual_addresslocation = locator.geocode(Actual_address)
            st.write("Actual_addresslocation: ",Actual_addresslocation)
-           lat_actual = Actual_addresslocation.latitude
-           long_actual = Actual_addresslocation.longitude
+           #lat_actual = Actual_addresslocation.latitude
+           #long_actual = Actual_addresslocation.longitude
            st.write("lat_actual",lat_actual)
            st.write("long_actual",long_actual)         
        except:
