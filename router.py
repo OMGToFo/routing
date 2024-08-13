@@ -226,12 +226,12 @@ if loc:
        st.write("Startadresse changed")
        try:
            locator = Nominatim(user_agent='thomasActualAdress')
-           Actual_addresslocation = locator.geocode(Actual_address)
+           Actual_addresslocation = locator.geocode(StartAddress)
            st.write("Actual_addresslocation: ",Actual_addresslocation)
-           #lat_actual = Actual_addresslocation.latitude
-           #long_actual = Actual_addresslocation.longitude
-           #st.write("lat_actual",lat_actual)
-           #st.write("long_actual",long_actual)         
+           lat_actual = Actual_addresslocation.latitude
+           long_actual = Actual_addresslocation.longitude
+           st.write("lat_actual",lat_actual)
+           st.write("long_actual",long_actual)         
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
