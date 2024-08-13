@@ -219,6 +219,8 @@ if loc:
    #st.write("actualLocation:", actualLocation)
 
    StartAddress = st.text_input("Start",value=Actualaddress)
+   if StartAddress != Actualaddress:
+       st.write("Startadresse changed")
 
 
 
