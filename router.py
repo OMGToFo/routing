@@ -223,15 +223,15 @@ if loc:
 
    StartAddress = st.text_input("Start",value=Actualaddress)
    if StartAddress != Actualaddress:
-       st.write("Startadresse changed")
+       #st.write("Startadresse changed")
        try:
            locator = Nominatim(user_agent='thomasActualAdress')
            Actual_addresslocation = locator.geocode(StartAddress)
-           st.write("Actual_addresslocation: ",Actual_addresslocation)
+           st.write("Start at: ",Actual_addresslocation)
            lat_actual = Actual_addresslocation.latitude
            long_actual = Actual_addresslocation.longitude
-           st.write("lat_actual",lat_actual)
-           st.write("long_actual",long_actual)         
+           #st.write("lat_actual",lat_actual)
+           #st.write("long_actual",long_actual)         
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
