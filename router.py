@@ -230,8 +230,8 @@ if loc:
            st.write("Actual_addresslocation: ",Actual_addresslocation)
            #lat_actual = Actual_addresslocation.latitude
            #long_actual = Actual_addresslocation.longitude
-           st.write("lat_actual",lat_actual)
-           st.write("long_actual",long_actual)         
+           #st.write("lat_actual",lat_actual)
+           #st.write("long_actual",long_actual)         
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
