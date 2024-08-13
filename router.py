@@ -214,7 +214,7 @@ if loc:
    # Extract the address
    address = ActuallocationAdress.address
    # Output the address
-   st.write(f"The address for the coordinates {actualLocation} is: {address}")
+   st.write(f"The address dtected for yor location is: {address}")
 
    #st.write("actualLocation:", actualLocation)
 
