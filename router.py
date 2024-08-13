@@ -224,6 +224,8 @@ if loc:
        try:
           actualLocation = get_lat_long_from_address(StartAddress)
           st.write("actualLocation: ",actualLocation)
+          lat_actual = actualLocation.latitude
+          long_actual = actualLocation.longitude
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
