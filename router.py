@@ -206,7 +206,7 @@ if loc:
 
    actualLocation = (lat_actual, long_actual)
 
-   #st.write("actualLocation:", actualLocation)
+   st.write("actualLocation:", actualLocation)
 
 
 
