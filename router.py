@@ -212,9 +212,9 @@ if loc:
    ActuallocationAdress = geolocator.reverse(actualLocation, exactly_one=True)
     
    # Extract the address
-   address = ActuallocationAdress.address
+   Actualaddress = ActuallocationAdress.address
    # Output the address
-   st.write(f"The address dtected for yor location is: {address}")
+   st.write(f"The address dtected for yor location is: {Actualaddress}")
 
    #st.write("actualLocation:", actualLocation)
 
