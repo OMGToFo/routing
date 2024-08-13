@@ -214,9 +214,11 @@ if loc:
    # Extract the address
    Actualaddress = ActuallocationAdress.address
    # Output the address
-   st.write(f"The address detected for yor location is: {Actualaddress}")
+   #st.write(f"The address detected for yor location is: {Actualaddress}")
 
    #st.write("actualLocation:", actualLocation)
+
+   StartAddress = st.text_input("Start",value=Actualaddress)
 
 
 
