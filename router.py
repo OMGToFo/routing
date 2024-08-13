@@ -58,11 +58,7 @@ def get_lat_long_from_address(address):
    return str(location.latitude) +"," + str(location.longitude)
 
 
-def get_lat_long_from_actual_address(Actual_address):
-   locator = Nominatim(user_agent='thomasActualAdress')
-   Actual_addresslocation = locator.geocode(Actual_address)
 
-   return str(Actual_addresslocation.latitude) +"," + str(Actual_addresslocation.longitude)
 
 
 def get_nearby_restaurants(latitude, longitude): #by yelp
@@ -229,14 +225,16 @@ if loc:
    if StartAddress != Actualaddress:
        st.write("Startadresse changed")
        try:
-          actualLocation = get_lat_long_from_actual_address(StartAddress)
-          st.write("actualLocation: ",actualLocation)
-          lat_actual = Actual_addresslocation.latitude
-          long_actual = Actual_addresslocation.longitude
+           locator = Nominatim(user_agent='thomasActualAdress')
+           Actual_addresslocation = locator.geocode(Actual_address)
+           st.write("Actual_addresslocation: ",Actual_addresslocation)
+           lat_actual = Actual_addresslocation.latitude
+           long_actual = Actual_addresslocation.longitude
+           st.write("lat_actual",lat_actual)
+           st.write("long_actual",long_actual)         
        except:
            st.warning("Did not find the location, enter another start address")
            st.stop()
-
 
 
 
