@@ -5,7 +5,8 @@ gTTS==2.5.0
 matplotlib==3.8.1
 meteostat==1.6.5
 openmeteo_requests==1.2.0
-pandas==1.4.4
+#pandas==1.4.4
+pqndas
 plotly==5.18.0
 prophet==1.1.1
 python-dotenv==1.0.1
@@ -17,7 +18,8 @@ retry_requests==2.0.0
 reverse_geocoder==1.5.1
 seaborn==0.11.2
 statsmodels==0.13.2
-streamlit==1.28.1
+#streamlit==1.28.1
+streamlit
 streamlit_datalist==0.0.5
 streamlit_folium==0.13.0
 streamlit_js_eval==0.1.5
