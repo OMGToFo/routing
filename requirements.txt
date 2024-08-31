@@ -6,7 +6,7 @@ matplotlib==3.8.1
 meteostat==1.6.5
 openmeteo_requests==1.2.0
 #pandas==1.4.4
-pqndas
+pandas
 plotly==5.18.0
 prophet==1.1.1
 python-dotenv==1.0.1
