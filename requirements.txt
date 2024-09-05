@@ -26,3 +26,4 @@ streamlit_js_eval==0.1.5
 streamlit_option_menu==0.3.2
 suntime==1.2.5
 timezonefinder==6.4.1
+openai
