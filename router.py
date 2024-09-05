@@ -1,4 +1,5 @@
 #2024.05.07 update wikipedia scrape
+#2024.09.05 addrd chatopenai, booking.com and bigger navigation button
 
 import streamlit as st
 import requests
@@ -43,6 +44,17 @@ POI_df = pd.DataFrame()
 OverviewSumDistance = 0
 OverviewSumTime = 0
 visaTripadvisorHotel = False
+
+import openai #old code
+from openai import OpenAI
+
+# Set up OpenAI API
+openai_api_key = ""  # Replace with your actual API key
+
+
+
+
+
 
 # Function to scrape Wikipedia information for a given location name
 def scrape_wikipedia(location_name):
@@ -194,7 +206,7 @@ typeList = [
 
 
 
-st.title("Simple Routing")
+st.title("Simple Route Planner")
 
 
 #####get time #######################################
@@ -260,6 +272,8 @@ if loc:
     togglecol4, togglecol5, togglecol6 = st.columns(3)
     visaGooglePOI = togglecol4.toggle("Show POIs by Google", value=False, key="hey Google")
     if visaGooglePOI:
+        st.divider()
+        st.text("Settings for Google Search:")
         eingabeCol1, eingabeCol2 = st.columns([1, 4])
 
         radiusEingabe = eingabeCol1.number_input("Radius (km)", value=5)
@@ -267,31 +281,60 @@ if loc:
 
         # Create a select box for the user to choose from the list
         selected_type = eingabeCol2.selectbox("Choose a type", typeList)
+        st.divider()
 
     #visaTripadvisorHotel = togglecol5.toggle("Show Hotels from Tripadvisor", value=False, key="hey Tripadvisor")
 
     visaBookingComHotel = togglecol5.toggle("Show Hotels from Booking.com", value=False, key="hey BookingCom")
     if visaBookingComHotel:
+        st.divider()
+        st.text("Settings for Hotel Bookings:")
         bookingCo1, bookingCol2,bookingCol3 = st.columns(3)
         numerOfAdults = bookingCo1.number_input("Number of adults", value=1)
         numerOfAdultsString = str(numerOfAdults)
 
         CheckInDate = bookingCol2.date_input("Check-In Date", today, key="end")
         CheckOutDate = bookingCol3.date_input("Check-Out Date", tomorrow, key="start")
-
+        st.divider()
 
 
     visaTrafficByWaze = togglecol6.toggle("Show traffic messages from Waze", value=False, key="hey Waze")
 
 
+    visaRoutingtipaByOpenAI = st.toggle("Show Tips from OpenAI")
+    if visaRoutingtipaByOpenAI:
+        openai_api_key = st.text_input("Enter OpemAI key")
+        pre_Input = st.text_input("Prompt", value="Please give me a short summary of interesting stops on the following route: ")
+
+
     st.divider()
 
+    #Make Checkbox larger
+    css = """
+    <style>
+    [data-baseweb="checkbox"] [data-testid="stCheckbox"] p {
+    /* Styles for the label text for checkbox */
+    font-size: 4rem;
+    width: 300px;
+    margin-top: 4rem;
+}
+    [data-testid="stCheckbox"] label span {
+        /* Styles the checkbox */
+        height: 3rem;
+        width: 3rem;
+    }
+    </style>
+    """
 
+    checkboxCol1, checkboxCol2,checkboxCol3 = st.columns([10,30,60],vertical_alignment="center")
 
+    st.write(css, unsafe_allow_html=True) #make checkbox larger
+    navigationStart = checkboxCol1.checkbox('   ')
+    checkboxCol2.subheader("Navigate!")
+    checkboxCol3.write("")
 
+    if navigationStart:
 
-
-    if st.checkbox('Navigate!'):
         # Initialize geolocator
         geolocator = Nominatim(user_agent="geoapiThomasRouting")
 
@@ -768,7 +811,7 @@ if loc:
                                 hotels = data.get("result", [])
 
                                 if (len(hotels)) ==0:
-                                    st.warning("Found no hotels on booking.com")
+                                    st.warning("Found no available hotels on booking.com")
 
                                 if (len(hotels)) >0:
                                     # Define the columns and extract data
@@ -838,8 +881,44 @@ if loc:
                             else:
                                 st.warning("No hotels found.")
 
+                        if visaRoutingtipaByOpenAI and openai_api_key == "":  ######################
+                            st.warning("Missing key for ChatOpenAI")
+
+                        if visaRoutingtipaByOpenAI and openai_api_key!="": ##########################
+
+                            client = OpenAI(
+                            # This is the default and can be omitted
+                            api_key = openai_api_key,)
+
+                            # User input
+
+                            user_input = (LegTransport + " from: " + "\n " + LegStartLocation + "\n " + "to: " + LegEndLocation)
 
 
+                            prompt_input = pre_Input + user_input
+
+                            # Use ChatGPT to generate a response
+                            if user_input:
+                                try:
+                                    response = client.chat.completions.create(
+                                        model="gpt-4o",  # Use GPT-3.5 or GPT-4 (e.g., "gpt-4")
+                                        messages=[
+                                            {"role": "system", "content": "You are a helpful assistant."},
+                                            {"role": "user", "content": prompt_input}
+                                        ],
+                                        max_tokens=800,  # Adjust the length of the response as needed
+                                    )
+                                    if response and response.choices:
+                                        bot_response = response.choices[0].message.content
+                                        st.subheader("")
+                                        st.info("Info by ChatOpenAI:")
+                                        with st.container(height=300):
+                                            st.write(bot_response)
+                                    else:
+                                        st.warning("OpenAI: I'm sorry, I couldn't generate a response at the moment.")
+                                except Exception as e:
+                                    st.warning("OpenAI: An error occurred while processing your request.")
+                                    st.write("Error Message:", str(e))
 
 
 
