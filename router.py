@@ -260,7 +260,7 @@ if loc:
     # Reset index and drop the old index column
     df.reset_index(drop=True, inplace=True)
 
-    result_df = st.data_editor(df, column_config=config, num_rows='dynamic')
+    result_df = st.data_editor(df, column_config=config, num_rows='dynamic',,width=400)
 
     st.divider()
     st.info("Show POIs at stops")
